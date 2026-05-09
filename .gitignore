@@ -1,0 +1,12 @@
+# Compiled output
+build/
+*.o
+
+# The binary itself
+ml-project
+
+# MNIST data files
+data/
+
+# Saved model weights
+models/
