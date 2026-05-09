@@ -31,6 +31,7 @@ void matrix_transpose(Matrix *m, Matrix *result);
 void matrix_elementwise_mul(Matrix *a, Matrix *b, Matrix *result);  // element wise multiplication multiplies the elements in the same position of two matrices
 void matrix_zero(Matrix *m);
 void matrix_copy(Matrix *src, Matrix *dst);
+void matrix_randomize(Matrix *m, float min, float max);
 
 
 #endif
