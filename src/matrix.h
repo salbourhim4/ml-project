@@ -4,8 +4,8 @@
 #include <stddef.h>
 
 typedef struct {
-    int row;
-    int col;
+    int rows;
+    int cols;
     float *data;
 } Matrix;
 

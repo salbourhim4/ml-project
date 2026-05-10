@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "matrix.h"
 
-#include <studdef.h>
+#include <stddef.h>
 
 Arena arena_create(size_t bytes) {
     Arena a = {0};
@@ -75,4 +75,25 @@ void matrix_sub(Matrix *a, Matrix *b, Matrix *result) {
             matrix_set(result, i, j, num);
         }
     }
+}
+
+void matrix_mul(Matrix *a, Matrix *b, Matrix *result) {
+    // matrix multiplication is valid as long as #cols_in_a = #rows_in_b
+    if (a->cols != b->rows) {
+        return;
+    }
+
+    for (int i = 0; i < a->rows; i++) {
+        float sum = 0;
+        for (int j = 0; j < b->cols; j++) {
+            for (int k = 0; k < a->cols; k++) {
+                sum += matrix_get(a, i, k) * matrix_get(b, k, j);
+            } 
+            matrix_set(result, i, j, sum);
+            sum = 0;
+        }
+    }
+    // Assume nxn matrices
+    //  i  j    i  j
+    //a[0][0]*b[0][0] + a[0][1]*b[1][0] + a[0][n]*b[n][0]
 }
