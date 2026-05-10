@@ -97,3 +97,12 @@ void matrix_mul(Matrix *a, Matrix *b, Matrix *result) {
     //  i  j    i  j
     //a[0][0]*b[0][0] + a[0][1]*b[1][0] + a[0][n]*b[n][0]
 }
+
+void matrix_scale(Matrix *m, float scalar, Matrix *result) {
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = 0; j < m->cols; j++) {
+            float scale = scalar * matrix_get(m, i, j);
+            matrix_set(result, i, j, scale);
+        }
+    }
+}
