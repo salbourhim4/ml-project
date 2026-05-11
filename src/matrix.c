@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "matrix.h"
 
@@ -106,3 +107,50 @@ void matrix_scale(Matrix *m, float scalar, Matrix *result) {
         }
     }
 }
+
+void matrix_transpose(Matrix *m, Matrix *result) {
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = 0; j < m->cols; j++) {
+            float x = matrix_get(m, i, j);
+            matrix_set(result, j, i, x);
+    }
+}
+
+void matrix_elementwise_mul(Matrix *a, Matrix *b, Matrix *result) {
+    for (int i = 0; i < a->rows; i++) {
+        for (int j = 0; j < a->cols; j++) {
+            float num = matrix_get(a, i, j) * matrix_get(b, i, j);
+            matrix_set(result, i, j, num);
+        }
+    }
+}
+
+void matrix_zero(Matrix *m) {
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = 0; j < m->cols; j++) {
+            matrix_set(m, i, j, 0.0);
+        }
+    }
+}
+
+void matrix_copy(Matrix *src, Matrix *dst) {
+    if (src->rows != dst->rows || src->cols != dst->cols) {
+        return;
+    }
+    for (int i = 0; i < src->rows; i++) {
+        for (int j = 0; j < src->cols; j++) {
+            float num = matrix_get(src, i, j);
+            matrix_set(dst, i, j, num);
+        }
+    }
+}
+
+void matrix_randomize(Matrix *m, float min, float max) {
+    for (int i = 0; i < m->rows; i++) {
+        for (int j = 0; j < m->cols; j++) {
+            float rand_num = min + ((float)rand() / (float)RAND_MAX) * (max - min);
+            matrix_set(m, i, j, rand_num);
+        }
+    }
+}
+
