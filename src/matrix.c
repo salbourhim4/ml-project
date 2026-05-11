@@ -113,6 +113,7 @@ void matrix_transpose(Matrix *m, Matrix *result) {
         for (int j = 0; j < m->cols; j++) {
             float x = matrix_get(m, i, j);
             matrix_set(result, j, i, x);
+       }
     }
 }
 
