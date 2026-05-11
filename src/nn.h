@@ -2,6 +2,7 @@
 #define NN_H
 
 #include <stddef.h>
+#include "matrix.h"
 
 typedef struct {
     Matrix *weights;      // array of weight matrices
@@ -9,3 +10,17 @@ typedef struct {
     Matrix *gradients;    // array of gradient matrices
     int num_layers;
 } Network;
+
+float relu(float x);
+float sigmoid(float x);
+float relu_derivative(float x);
+float sigmoid_derivative(float x);
+
+Network network_create(Arena *a, int *layer_sizes, int num_layers);
+void network_forward(Network *net, Matrix *input, float (*activation)(float));
+void network_backward(Network *net, Matrix *output, Matrix *labels, float (*derivative)(float)); //Labels from mnist
+void network_update_weights(Network *net, float learning_rate);
+void network_free(Network *n);
+float cross_entropy(Matrix *output, Matrix *labels);
+
+#endif
