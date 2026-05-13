@@ -67,3 +67,7 @@ void network_forward(Network *net, Matrix *input, Arena *scratch, float (*activa
         input = &a;
     }
 }
+
+void network_backward(Network *net, Matrix *output, Matrix *labels, float (*derivative)(float)) {
+    
+}
