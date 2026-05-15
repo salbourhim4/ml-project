@@ -51,23 +51,73 @@ Network network_create(Arena *a, int *layer_sizes, int num_layers) {
     return n;
 }
 
-void network_forward(Network *net, Matrix *input, Arena *scratch, float (*activation)(float)) {
+void network_forward(Network *net, Matrix *input, Matrix *zs, Matrix *as, Arena *scratch, float (*activation)(float)) {
     for (int i = 0; i < net->num_layers - 1; i++) {
-        Matrix z = matrix_create(scratch, net->weights[i].cols, 1);
-        Matrix a = matrix_create(scratch, net->weights[i].cols, 1);
+        Matrix z = matrix_create(scratch, net->weights[i].rows, 1);
+        Matrix a = matrix_create(scratch, net->weights[i].rows, 1);
         
         matrix_mul(&net->weights[i], input, &z);
         matrix_add(&z, &net->biases[i], &z);
-        
+        zs[i] = z;
+
+
         for (int j = 0; j < z.rows*z.cols; j++) {
             float val = matrix_get(&z, j, 0);
             matrix_set(&a, j, 0, activation(val));
         }
-        
+
+        as[i] = a;     
         input = &a;
     }
 }
 
-void network_backward(Network *net, Matrix *output, Matrix *labels, float (*derivative)(float)) {
-    
+Matrix compute_dE(Matrix *output, Matrix *labels, Arena *scratch) {
+    Matrix dE = matrix_create(scratch, output->rows, 1);
+    matrix_sub(output, labels, &dE);
+    return dE;
+}
+
+Matrix compute_dZ(Matrix *error, Matrix *z, Arena *scratch, float (*derivative)(float)) {
+    Matrix dZ = matrix_create(scratch, z->rows, 1);
+
+    for (int j = 0; j < z->rows; j++) {
+        float d = derivative(matrix_get(z, j, 0));
+        float e = matrix_get(error, j, 0);
+        matrix_set(&dZ, j, 0, d * e);
+    }
+    return dZ;
+}
+
+Matrix compute_dW(Matrix *dZ, Matrix *input, Arena *scratch) {
+    Matrix dW = matrix_create(scratch, dZ->rows, input->rows);
+    Matrix input_transpose = matrix_create(scratch, input->cols, input->rows);
+    matrix_transpose(input, &input_transpose);
+    matrix_mul(dZ, &input_transpose, &dW);
+    return dW;
+}
+
+Matrix compute_dA(Matrix *weights, Matrix *dZ, Arena *scratch) {
+    Matrix dA = matrix_create(scratch, weights->cols, 1);
+    Matrix weights_transpose = matrix_create(scratch, weights->cols, weights->rows);
+    matrix_transpose(weights, &weights_transpose);
+    matrix_mul(&weights_transpose, dZ, &dA);
+    return dA;
+}
+
+void network_backward(Network *net, Matrix *input, Matrix *output, Matrix *labels, Matrix *zs, Matrix *as, Arena *scratch, float (*derivative)(float)) {
+    Matrix dE = compute_dE(output, labels, scratch);
+    for (int i = net->num_layers - 2; i >= 0; i--) {
+        Matrix *layer_input;
+        if (i == 0) {
+            layer_input = input;
+        }
+        else {
+            layer_input = &as[i-1];
+        }
+        Matrix dZ = compute_dZ(&dE, &zs[i], scratch, derivative);
+        Matrix dW = compute_dW(&dZ, layer_input, scratch);
+        matrix_copy(&dW, &net->gradients[i]);
+        matrix_copy(&dZ, &net->biases[i]);
+        dE = compute_dA(&net->weights[i], &dZ, scratch);
+    }
 }
