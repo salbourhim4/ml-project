@@ -36,18 +36,20 @@ Network network_create(Arena *a, int *layer_sizes, int num_layers) {
 
     n.weights = arena_alloc(a, (num_layers - 1) * sizeof(Matrix));
     n.biases = arena_alloc(a, (num_layers - 1) * sizeof(Matrix));
-    n.gradients = arena_alloc(a, (num_layers - 1) * sizeof(Matrix));
+    n.weight_gradients = arena_alloc(a, (num_layers - 1) * sizeof(Matrix));
+    n.bias_gradients = arena_alloc(a, (num_layers - 1) * sizeof(Matrix));
 
     for (int i = 0; i < num_layers - 1; i++) {
         n.weights[i] = matrix_create(a, layer_sizes[i], layer_sizes[i+1]);
         n.biases[i] = matrix_create(a, 1, layer_sizes[i+1]);
-        n.gradients[i] = matrix_create(a, layer_sizes[i], layer_sizes[i+1]);
+        n.weight_gradients[i] = matrix_create(a, layer_sizes[i], layer_sizes[i+1]);
+        n.bias_gradients[i] = matrix_create(a, 1, layer_sizes[i+1]);
 
         matrix_randomize(&n.weights[i], -1.0, 1.0);
         matrix_zero(&n.biases[i]);
-        matrix_zero(&n.gradients[i]);
+        matrix_zero(&n.weight_gradients[i]);
+        matrix_zero(&n.bias_gradients[i]);
     }
-
     return n;
 }
 
@@ -59,7 +61,6 @@ void network_forward(Network *net, Matrix *input, Matrix *zs, Matrix *as, Arena 
         matrix_mul(&net->weights[i], input, &z);
         matrix_add(&z, &net->biases[i], &z);
         zs[i] = z;
-
 
         for (int j = 0; j < z.rows*z.cols; j++) {
             float val = matrix_get(&z, j, 0);
@@ -116,8 +117,27 @@ void network_backward(Network *net, Matrix *input, Matrix *output, Matrix *label
         }
         Matrix dZ = compute_dZ(&dE, &zs[i], scratch, derivative);
         Matrix dW = compute_dW(&dZ, layer_input, scratch);
-        matrix_copy(&dW, &net->gradients[i]);
-        matrix_copy(&dZ, &net->biases[i]);
+        matrix_copy(&dW, &net->weight_gradients[i]);
+        matrix_copy(&dZ, &net->bias_gradients[i]);
         dE = compute_dA(&net->weights[i], &dZ, scratch);
     }
 }
+
+void network_update_weights(Network *net, float learning_rate) {
+    for (int i = 0; i < net->num_layers - 1 ; i++) {
+        matrix_scale(&net->weight_gradients[i], learning_rate, &net->weight_gradients[i]);
+        matrix_sub(&net->weights[i], &net->weight_gradients[i], &net->weights[i]);
+
+        matrix_scale(&net->bias_gradients[i], learning_rate, &net->bias_gradients[i]);
+        matrix_sub(&net->biases[i], &net->bias_gradients[i], &net->biases[i]);
+    }
+}
+
+float cross_entropy(Matrix *output, Matrix *labels) {
+    float loss = 0.0;
+    for (int i = 0; i < output->rows; i++) {
+        loss += matrix_get(labels, i, 0) * log(matrix_get(output, i, 0));
+    }
+    return -1 * loss; 
+}
+
