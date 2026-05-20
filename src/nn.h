@@ -7,7 +7,8 @@
 typedef struct {
     Matrix *weights;      // array of weight matrices
     Matrix *biases;       // array of bias vectors
-    Matrix *gradients;    // array of gradient matrices
+    Matrix *weight_gradients;    // array of weight gradient matrices
+    Matrix *bias_gradients; 
     int num_layers;
 } Network;
 
