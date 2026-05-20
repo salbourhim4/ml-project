@@ -28,7 +28,7 @@ Matrix compute_dA(Matrix *weights, Matrix *dZ, Arena *scratch);
 
 void network_backward(Network *net, Matrix *input, Matrix *output, Matrix *labels, Matrix *zs, Matrix *as, Arena *scratch, float (*derivative)(float));//Labels from mnist
 void network_update_weights(Network *net, float learning_rate);
-void network_free(Network *n);
+
 float cross_entropy(Matrix *output, Matrix *labels);
 
 #endif
