@@ -124,11 +124,17 @@ void network_backward(Network *net, Matrix *input, Matrix *output, Matrix *label
         Matrix *layer_input;
         if (i == 0) {
             layer_input = input;
-        }
-        else {
+        } else {
             layer_input = &as[i-1];
         }
-        Matrix dZ = compute_dZ(&dE, &zs[i], scratch, derivative);
+
+        Matrix dZ;
+        if (i == net->num_layers - 2) {
+            dZ = dE;  // softmax + cross entropy derivative simplifies to output - labels
+        } else {
+            dZ = compute_dZ(&dE, &zs[i], scratch, derivative);
+        }
+
         Matrix dW = compute_dW(&dZ, layer_input, scratch);
         matrix_copy(&dW, &net->weight_gradients[i]);
         matrix_copy(&dZ, &net->bias_gradients[i]);
