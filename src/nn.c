@@ -40,10 +40,10 @@ Network network_create(Arena *a, int *layer_sizes, int num_layers) {
     n.bias_gradients = arena_alloc(a, (num_layers - 1) * sizeof(Matrix));
 
     for (int i = 0; i < num_layers - 1; i++) {
-        n.weights[i] = matrix_create(a, layer_sizes[i], layer_sizes[i+1]);
-        n.biases[i] = matrix_create(a, 1, layer_sizes[i+1]);
-        n.weight_gradients[i] = matrix_create(a, layer_sizes[i], layer_sizes[i+1]);
-        n.bias_gradients[i] = matrix_create(a, 1, layer_sizes[i+1]);
+        n.weights[i] = matrix_create(a, layer_sizes[i+1], layer_sizes[i]);
+        n.biases[i] = matrix_create(a, layer_sizes[i+1], 1);
+        n.weight_gradients[i] = matrix_create(a, layer_sizes[i+1], layer_sizes[i]);
+        n.bias_gradients[i] = matrix_create(a, layer_sizes[i+1], 1);
 
         matrix_randomize(&n.weights[i], -1.0, 1.0);
         matrix_zero(&n.biases[i]);
@@ -57,18 +57,31 @@ void network_forward(Network *net, Matrix *input, Matrix *zs, Matrix *as, Arena 
     for (int i = 0; i < net->num_layers - 1; i++) {
         Matrix z = matrix_create(scratch, net->weights[i].rows, 1);
         Matrix a = matrix_create(scratch, net->weights[i].rows, 1);
-        
+
         matrix_mul(&net->weights[i], input, &z);
         matrix_add(&z, &net->biases[i], &z);
         zs[i] = z;
 
-        for (int j = 0; j < z.rows*z.cols; j++) {
-            float val = matrix_get(&z, j, 0);
-            matrix_set(&a, j, 0, activation(val));
+        if (i == net->num_layers - 2) {
+            // output layer — apply softmax
+            float sum = 0.0;
+            for (int j = 0; j < z.rows; j++) {
+                float val = exp(matrix_get(&z, j, 0));
+                matrix_set(&a, j, 0, val);
+                sum += val;
+            }
+            for (int j = 0; j < z.rows; j++) {
+                matrix_set(&a, j, 0, matrix_get(&a, j, 0) / sum);
+            }
+        } else {
+            // hidden layers — apply whatever activation was passed in
+            for (int j = 0; j < z.rows * z.cols; j++) {
+                matrix_set(&a, j, 0, activation(matrix_get(&z, j, 0)));
+            }
         }
 
-        as[i] = a;     
-        input = &a;
+        as[i] = a;
+        input = &as[i];
     }
 }
 
@@ -136,8 +149,10 @@ void network_update_weights(Network *net, float learning_rate) {
 float cross_entropy(Matrix *output, Matrix *labels) {
     float loss = 0.0;
     for (int i = 0; i < output->rows; i++) {
-        loss += matrix_get(labels, i, 0) * log(matrix_get(output, i, 0));
+        float val = matrix_get(output, i, 0);
+        if (val > 0.0) {
+            loss += matrix_get(labels, i, 0) * log(val);
+        }
     }
     return -1 * loss; 
 }
-
