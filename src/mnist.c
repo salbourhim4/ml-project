@@ -103,6 +103,10 @@ MNISTData mnist_load(Arena *a, const char *image_path, const char *label_path) {
         matrix_set(&labels[i], label_byte, 0, 1.0f);
     }
 
+    data.images = images;
+    data.labels = labels;
+    data.num_samples = num_images;
+
     fclose(img_f);
     fclose(lbl_f);
     return data;
