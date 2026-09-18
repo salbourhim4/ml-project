@@ -64,9 +64,17 @@ void network_forward(Network *net, Matrix *input, Matrix *zs, Matrix *as, Arena 
 
         if (i == net->num_layers - 2) {
             // output layer — apply softmax
+            float max_z = matrix_get(&z, 0, 0);
+            for (int j = 1; j < z.rows; j++) {
+                float val = matrix_get(&z, j, 0);
+                if (val > max_z) {
+                    max_z = val;
+                }
+            }
+
             float sum = 0.0;
             for (int j = 0; j < z.rows; j++) {
-                float val = exp(matrix_get(&z, j, 0));
+                float val = exp(matrix_get(&z, j, 0) - max_z);
                 matrix_set(&a, j, 0, val);
                 sum += val;
             }
