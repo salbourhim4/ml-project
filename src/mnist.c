@@ -59,8 +59,15 @@ MNISTData mnist_load(Arena *a, const char *image_path, const char *label_path) {
         return data;
     }
 
-    // TODO: allocate images/labels arrays and read per-sample pixel/label
-    // data (next pass).
+    Matrix *images = arena_alloc(a, num_images * sizeof(Matrix));
+    Matrix *labels = arena_alloc(a, num_images * sizeof(Matrix));
+    if (!images || !labels) {
+        fclose(img_f);
+        fclose(lbl_f);
+        return data;
+    }
+
+    // TODO: read per-sample pixel/label data into images/labels (next pass).
 
     fclose(img_f);
     fclose(lbl_f);
