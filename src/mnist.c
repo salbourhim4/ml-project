@@ -39,7 +39,8 @@ MNISTData mnist_load(Arena *a, const char *image_path, const char *label_path) {
     if (!read_uint32_be(img_f, &img_magic) || img_magic != 2051 ||
         !read_uint32_be(img_f, &num_images) ||
         !read_uint32_be(img_f, &rows) ||
-        !read_uint32_be(img_f, &cols)) {
+        !read_uint32_be(img_f, &cols) ||
+        rows * cols == 0 || rows * cols > 1000000) {
         fclose(img_f);
         fclose(lbl_f);
         return data;
