@@ -60,7 +60,11 @@ void matrix_set(Matrix *m, int i, int j, float val) {
     m->data[pos] = val;
 }
 
-void matrix_add(Matrix *a, Matrix *b, Matrix *result) { // assuming both are n x n matrices 
+void matrix_add(Matrix *a, Matrix *b, Matrix *result) { // assuming both are n x n matrices
+    if (a->rows != b->rows || a->cols != b->cols ||
+        a->rows != result->rows || a->cols != result->cols) {
+        return;
+    }
     for (int i = 0; i < a->rows; i++) {
         for (int j = 0; j < a->cols; j++) {
             float num = matrix_get(a, i, j) + matrix_get(b, i, j);
@@ -70,6 +74,10 @@ void matrix_add(Matrix *a, Matrix *b, Matrix *result) { // assuming both are n x
 }
 
 void matrix_sub(Matrix *a, Matrix *b, Matrix *result) {
+    if (a->rows != b->rows || a->cols != b->cols ||
+        a->rows != result->rows || a->cols != result->cols) {
+        return;
+    }
     for (int i = 0; i < a->rows; i++) {
         for (int j = 0; j < a->cols; j++) {
             float num = matrix_get(a, i, j) - matrix_get(b, i, j);
@@ -118,6 +126,10 @@ void matrix_transpose(Matrix *m, Matrix *result) {
 }
 
 void matrix_elementwise_mul(Matrix *a, Matrix *b, Matrix *result) {
+    if (a->rows != b->rows || a->cols != b->cols ||
+        a->rows != result->rows || a->cols != result->cols) {
+        return;
+    }
     for (int i = 0; i < a->rows; i++) {
         for (int j = 0; j < a->cols; j++) {
             float num = matrix_get(a, i, j) * matrix_get(b, i, j);
