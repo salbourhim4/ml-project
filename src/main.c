@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "matrix.h"
 
 void print_matrix(Matrix *m) {
@@ -12,6 +14,8 @@ void print_matrix(Matrix *m) {
 }
 
 int main(void) {
+    srand((unsigned)time(NULL));
+
     Arena a = arena_create(1024 * 1024);
 
     // test matrices
