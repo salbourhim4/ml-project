@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -g
+LDLIBS = -lm
 
 SRC_DIR = src
 BUILD_DIR = build
@@ -10,7 +11,7 @@ SRCS = src/matrix.c src/main.c src/mnist.c src/nn.c
 OBJS = $(SRCS:src/%.c=build/%.o)
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDLIBS)
 
 build/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
