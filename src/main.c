@@ -28,6 +28,23 @@ static int argmax(Matrix *m) {
     return best;
 }
 
+static void evaluate(Network *net, int num_layers, Matrix *zs, Matrix *as, MNISTData *test_data, Arena *scratch) {
+    int correct = 0;
+
+    for (int i = 0; i < test_data->num_samples; i++) {
+        arena_reset(scratch);
+
+        network_forward(net, &test_data->images[i], zs, as, scratch, sigmoid);
+        Matrix *output = &as[num_layers - 2];
+
+        if (argmax(output) == argmax(&test_data->labels[i])) {
+            correct++;
+        }
+    }
+
+    // TODO: print accuracy (next pass)
+}
+
 static void train(void) {
     srand((unsigned)time(NULL));
 
@@ -78,6 +95,13 @@ static void train(void) {
         }
 
         printf("epoch %d: avg loss %f\n", epoch, total_loss / data.num_samples);
+    }
+
+    MNISTData test_data = mnist_load(&model_a, "data/t10k-images-idx3-ubyte", "data/t10k-labels-idx1-ubyte");
+    if (test_data.num_samples <= 0) {
+        fprintf(stderr, "Failed to load MNIST test data, skipping evaluation\n");
+    } else {
+        // TODO: call evaluate (next pass)
     }
 
     arena_destroy(&scratch);
