@@ -48,7 +48,10 @@ static void train(void) {
         for (int i = 0; i < data.num_samples; i++) {
             arena_reset(&scratch);
 
-            // TODO: forward, backward, weight update (next pass)
+            network_forward(&net, &data.images[i], zs, as, &scratch, sigmoid);
+            Matrix *output = &as[num_layers - 2];
+
+            // TODO: backward, weight update, loss (next pass)
         }
     }
 
