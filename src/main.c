@@ -41,7 +41,16 @@ static void train(void) {
     Matrix *zs = arena_alloc(&model_a, (num_layers - 1) * sizeof(Matrix));
     Matrix *as = arena_alloc(&model_a, (num_layers - 1) * sizeof(Matrix));
 
-    // TODO: training loop (next pass)
+    float learning_rate = 0.1f;
+    int num_epochs = 5;
+
+    for (int epoch = 0; epoch < num_epochs; epoch++) {
+        for (int i = 0; i < data.num_samples; i++) {
+            arena_reset(&scratch);
+
+            // TODO: forward, backward, weight update (next pass)
+        }
+    }
 
     arena_destroy(&scratch);
     arena_destroy(&model_a);
