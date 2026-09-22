@@ -42,7 +42,7 @@ static void evaluate(Network *net, int num_layers, Matrix *zs, Matrix *as, MNIST
         }
     }
 
-    // TODO: print accuracy (next pass)
+    printf("Test accuracy: %.2f%% (%d/%d)\n", (float)correct / test_data->num_samples * 100.0f, correct, test_data->num_samples);
 }
 
 static void train(void) {
@@ -101,7 +101,7 @@ static void train(void) {
     if (test_data.num_samples <= 0) {
         fprintf(stderr, "Failed to load MNIST test data, skipping evaluation\n");
     } else {
-        // TODO: call evaluate (next pass)
+        evaluate(&net, num_layers, zs, as, &test_data, &scratch);
     }
 
     arena_destroy(&scratch);
