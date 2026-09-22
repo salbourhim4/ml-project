@@ -51,7 +51,10 @@ static void train(void) {
             network_forward(&net, &data.images[i], zs, as, &scratch, sigmoid);
             Matrix *output = &as[num_layers - 2];
 
-            // TODO: backward, weight update, loss (next pass)
+            network_backward(&net, &data.images[i], output, &data.labels[i], zs, as, &scratch, sigmoid_derivative);
+            network_update_weights(&net, learning_rate);
+
+            // TODO: loss printing (next pass)
         }
     }
 
