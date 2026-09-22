@@ -15,6 +15,19 @@ void print_matrix(Matrix *m) {
     printf("\n");
 }
 
+static int argmax(Matrix *m) {
+    int best = 0;
+    float best_val = matrix_get(m, 0, 0);
+    for (int i = 1; i < m->rows; i++) {
+        float val = matrix_get(m, i, 0);
+        if (val > best_val) {
+            best_val = val;
+            best = i;
+        }
+    }
+    return best;
+}
+
 static void train(void) {
     srand((unsigned)time(NULL));
 
