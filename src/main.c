@@ -57,6 +57,11 @@ static void train(void) {
             network_update_weights(&net, learning_rate);
 
             total_loss += cross_entropy(output, &data.labels[i]);
+
+            if ((i + 1) % 5000 == 0) {
+                printf("  epoch %d: %d/%d\n", epoch, i + 1, data.num_samples);
+                fflush(stdout);
+            }
         }
 
         printf("epoch %d: avg loss %f\n", epoch, total_loss / data.num_samples);
