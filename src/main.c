@@ -45,6 +45,8 @@ static void train(void) {
     int num_epochs = 5;
 
     for (int epoch = 0; epoch < num_epochs; epoch++) {
+        float total_loss = 0.0f;
+
         for (int i = 0; i < data.num_samples; i++) {
             arena_reset(&scratch);
 
@@ -54,8 +56,10 @@ static void train(void) {
             network_backward(&net, &data.images[i], output, &data.labels[i], zs, as, &scratch, sigmoid_derivative);
             network_update_weights(&net, learning_rate);
 
-            // TODO: loss printing (next pass)
+            total_loss += cross_entropy(output, &data.labels[i]);
         }
+
+        printf("epoch %d: avg loss %f\n", epoch, total_loss / data.num_samples);
     }
 
     arena_destroy(&scratch);
