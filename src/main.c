@@ -45,7 +45,7 @@ static void evaluate(Network *net, int num_layers, Matrix *zs, Matrix *as, MNIST
     printf("Test accuracy: %.2f%% (%d/%d)\n", (float)correct / test_data->num_samples * 100.0f, correct, test_data->num_samples);
 }
 
-static void train(void) {
+static void train(int num_epochs, float learning_rate) {
     srand((unsigned)time(NULL));
 
     // Model arena: sized for the full 60k-image MNIST training set
@@ -70,9 +70,6 @@ static void train(void) {
 
     Matrix *zs = arena_alloc(&model_a, (num_layers - 1) * sizeof(Matrix));
     Matrix *as = arena_alloc(&model_a, (num_layers - 1) * sizeof(Matrix));
-
-    float learning_rate = 0.1f;
-    int num_epochs = 5;
 
     for (int epoch = 0; epoch < num_epochs; epoch++) {
         float total_loss = 0.0f;
@@ -109,6 +106,6 @@ static void train(void) {
 }
 
 int main(void) {
-    train();
+    train(5, 0.1f);
     return 0;
 }
