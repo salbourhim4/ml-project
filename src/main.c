@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 #include "matrix.h"
 #include "mnist.h"
 #include "nn.h"
@@ -43,6 +44,28 @@ static void evaluate(Network *net, int num_layers, Matrix *zs, Matrix *as, MNIST
     }
 
     printf("Test accuracy: %.2f%% (%d/%d)\n", (float)correct / test_data->num_samples * 100.0f, correct, test_data->num_samples);
+}
+
+static void parse_args(int argc, char **argv, int *num_epochs, float *learning_rate) {
+    if (argc >= 2) {
+        char *endptr;
+        long val = strtol(argv[1], &endptr, 10);
+        if (endptr == argv[1] || *endptr != '\0' || val <= 0) {
+            fprintf(stderr, "Invalid epochs '%s', using default %d\n", argv[1], *num_epochs);
+        } else {
+            *num_epochs = (int)val;
+        }
+    }
+
+    if (argc >= 3) {
+        char *endptr;
+        float val = strtof(argv[2], &endptr);
+        if (endptr == argv[2] || *endptr != '\0' || val <= 0.0f || !isfinite(val)) {
+            fprintf(stderr, "Invalid learning rate '%s', using default %g\n", argv[2], (double)*learning_rate);
+        } else {
+            *learning_rate = val;
+        }
+    }
 }
 
 static void train(int num_epochs, float learning_rate) {
