@@ -128,7 +128,11 @@ static void train(int num_epochs, float learning_rate) {
     arena_destroy(&model_a);
 }
 
-int main(void) {
-    train(5, 0.1f);
+int main(int argc, char **argv) {
+    int num_epochs = 5;
+    float learning_rate = 0.1f;
+
+    parse_args(argc, argv, &num_epochs, &learning_rate);
+    train(num_epochs, learning_rate);
     return 0;
 }
