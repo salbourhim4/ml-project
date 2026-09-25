@@ -26,8 +26,16 @@ Produces the `ml-project` binary. Requires a C compiler (`gcc`) and links agains
 ## Run
 
 ```
-./ml-project
+./ml-project [epochs] [learning_rate]
 ```
+
+Both arguments are optional and default to `5` epochs and a learning rate of `0.1`. For example:
+
+```
+./ml-project 10 0.05
+```
+
+An invalid or non-positive value for either argument prints a warning and falls back to its default instead of failing.
 
 The MNIST IDX files must be present, uncompressed, in a `data/` directory at the repo root:
 
