@@ -69,6 +69,8 @@ static void parse_args(int argc, char **argv, int *num_epochs, float *learning_r
 }
 
 static void train(int num_epochs, float learning_rate) {
+    printf("Training: epochs=%d, learning_rate=%g\n", num_epochs, (double)learning_rate);
+
     srand((unsigned)time(NULL));
 
     // Model arena: sized for the full 60k-image MNIST training set
